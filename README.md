@@ -15,3 +15,4 @@ GoCollab is a web-based collaboration tool uses to support a group or more indiv
 - Vue.js 2
 
 ## Screenshots
+![login-page](https://github.com/jmdhagz/GoCollab/blob/master/public/images/login-page.jpg)
