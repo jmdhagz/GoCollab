@@ -1,5 +1,5 @@
 # GoCollab
-A simple Notebook Web App build with Laravel Framework and Vue.js
+GoCollab is a web-based collaboration tool uses to support a group or more individuals to accomplish a common goal or objective. Built using Laravel Framework and Vue.js
 
 ## Features
 - User Authentication
