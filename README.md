@@ -1,51 +1,38 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+# GoCollab
+GoCollab is a web-based collaboration tool uses to support a group or more individuals to accomplish a common goal or objective. Made using Laravel Framework and Vue.js
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+## Features
+- User Authentication
+- Drag & Drop of cards
+- Add member to board
+- Archive Board
+- Checklist
+- Add label to cards
+- Add cover
 
-## About Laravel
+## Project Info
+- Laravel Framework 5.4
+- Vue.js 2
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+## Screenshots
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Login / Registration Page
+![login-page](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/login-page.jpg)
+![register-page](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/register-page.jpg)
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications. A superb combination of simplicity, elegance, and innovation give you tools you need to build any application with which you are tasked.
+### Board / Create Board
+![board](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/board.jpg)
+![new-board](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/new-board.jpg)
 
-## Learning Laravel
+### Inside the Board
+You can Drag & Drop the cards into any list
+![board-list](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/board-list.jpg)
+![board-list-dragged](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/board-list-dragged.jpg)
+![open-card](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/open-card.jpg)
 
-Laravel has the most extensive and thorough documentation and video tutorial library of any modern web application framework. The [Laravel documentation](https://laravel.com/docs) is thorough, complete, and makes it a breeze to get started learning the framework.
+### Members
+![board-members](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/board-members.jpg)
 
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 900 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](http://patreon.com/taylorotwell):
-
-- **[Vehikl](http://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Styde](https://styde.net)**
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+### Archive
+![archived-item](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/archived-item.jpg)
+![visited-archived-card](https://github.com/jmdhagz/GoCollab/blob/master/public/images/screenshot/visited-archived-card.jpg)
