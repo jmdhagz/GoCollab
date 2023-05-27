@@ -1,13 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.4
+-- version 4.9.7
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Mar 13, 2021 at 07:16 AM
--- Server version: 5.7.14
--- PHP Version: 5.6.25
+-- Host: localhost
+-- Generation Time: May 27, 2023 at 04:16 AM
+-- Server version: 5.7.31
+-- PHP Version: 7.3.21
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -52,9 +54,9 @@ CREATE TABLE `boards` (
 --
 
 INSERT INTO `boards` (`id`, `board_name`, `description`, `starred`, `created_at`, `updated_at`) VALUES
-(1, 'Software Development', 'Accomplishments under Software Development Team', 0, '2019-11-24 02:44:55', '2019-11-24 02:44:55'),
-(2, 'Website Development', 'Accomplishment under Web Department', 0, '2019-11-24 02:45:26', '2019-11-24 02:45:26'),
-(3, 'Agile Sprint Board', 'Agile Development', 0, '2019-11-24 02:46:24', '2019-11-24 02:46:24');
+(1, 'Software Solutions Team', 'SST', 0, '2023-05-25 17:22:01', '2023-05-25 17:22:01'),
+(2, 'Tekspert', 'haha', 0, '2023-05-25 18:27:17', '2023-05-25 18:27:17'),
+(3, 'QA Board', 'for QA', 0, '2023-05-26 18:49:05', '2023-05-26 18:49:05');
 
 -- --------------------------------------------------------
 
@@ -77,10 +79,11 @@ CREATE TABLE `board_lists` (
 --
 
 INSERT INTO `board_lists` (`id`, `boards_id`, `list_name`, `date_created`, `archived`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Done', '2019-11-24', 0, '2019-11-24 02:53:20', '2019-11-24 02:53:20'),
-(2, 1, 'Doing', '2019-11-24', 0, '2019-11-24 02:54:21', '2019-11-24 02:54:21'),
-(3, 1, 'To Do', '2019-11-24', 0, '2019-11-24 02:56:09', '2019-11-24 02:56:09'),
-(4, 1, 'For Testing', '2019-11-24', 0, '2019-11-24 03:13:14', '2019-11-24 03:13:14');
+(1, 1, 'Done', '2023-05-26', 0, '2023-05-25 17:22:34', '2023-05-26 01:44:41'),
+(2, 1, 'For QA', '2023-05-26', 0, '2023-05-25 17:23:12', '2023-05-26 01:44:46'),
+(3, 1, 'In Progress', '2023-05-26', 0, '2023-05-25 17:23:32', '2023-05-26 01:45:04'),
+(4, 1, 'Bug', '2023-05-26', 0, '2023-05-25 17:24:58', '2023-05-26 01:44:52'),
+(5, 1, 'Ticket', '2023-05-26', 0, '2023-05-25 17:38:18', '2023-05-26 06:23:19');
 
 -- --------------------------------------------------------
 
@@ -105,10 +108,11 @@ CREATE TABLE `board_members` (
 --
 
 INSERT INTO `board_members` (`id`, `boards_id`, `users_id`, `date_joined`, `permissions_id`, `starred`, `is_owner`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, '2019-11-24', NULL, 1, 1, '2019-11-24 02:44:55', '2019-11-24 02:46:30'),
-(2, 2, 1, '2019-11-24', NULL, 0, 1, '2019-11-24 02:45:26', '2019-11-24 02:45:26'),
-(3, 3, 1, '2019-11-24', NULL, 1, 1, '2019-11-24 02:46:24', '2019-11-24 02:46:27'),
-(4, 1, 2, '2019-11-24', NULL, 0, 0, '2019-11-24 03:16:00', '2019-11-24 03:16:00');
+(1, 1, 1, '2023-05-26', NULL, 1, 1, '2023-05-25 17:22:01', '2023-05-26 06:22:57'),
+(2, 2, 1, '2023-05-26', NULL, 0, 1, '2023-05-25 18:27:17', '2023-05-25 18:27:17'),
+(3, 3, 4, '2023-05-27', NULL, 0, 1, '2023-05-26 18:49:05', '2023-05-26 18:49:05'),
+(5, 1, 4, '2023-05-27', NULL, 1, 0, '2023-05-26 19:17:52', '2023-05-26 19:25:52'),
+(6, 1, 3, '2023-05-27', NULL, 0, 0, '2023-05-26 19:37:00', '2023-05-26 19:37:00');
 
 -- --------------------------------------------------------
 
@@ -123,8 +127,9 @@ CREATE TABLE `cards` (
   `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `date_created` date NOT NULL,
   `due_date` date DEFAULT NULL,
-  `labels_id` int(11) NOT NULL,
-  `archived` int(11) NOT NULL,
+  `labels_id` int(11) NOT NULL DEFAULT '0',
+  `archived` int(11) NOT NULL DEFAULT '0',
+  `ticket_id` int(11) NOT NULL DEFAULT '0',
   `attachment` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -134,11 +139,9 @@ CREATE TABLE `cards` (
 -- Dumping data for table `cards`
 --
 
-INSERT INTO `cards` (`id`, `board_lists_id`, `card_name`, `description`, `date_created`, `due_date`, `labels_id`, `archived`, `attachment`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Navigation Bar', 'Positioning of menu items fixed', '2019-11-24', '2019-11-04', 1, 0, 'images/images.png', '2019-11-24 02:59:59', '2019-11-24 03:10:30'),
-(2, 2, 'Users Portal', 'Portal for the users to check their record', '2019-11-24', '2019-11-30', 2, 0, NULL, '2019-11-24 03:06:28', '2019-11-24 03:10:43'),
-(3, 3, 'Add to Cart function won\'t work', 'To check the reason', '2019-11-24', '2019-11-22', 4, 0, 'images/CTA-Add-to-Cart-Button-JPG-Graphic-Cave-1080x628.jpg', '2019-11-24 03:07:10', '2019-11-24 03:12:22'),
-(4, 1, 'Admin Portal', 'Admin can manage the user', '2019-11-24', '2019-10-02', 1, 1, 'images/images.jpg', '2019-11-24 03:17:38', '2019-11-24 03:23:14');
+INSERT INTO `cards` (`id`, `board_lists_id`, `card_name`, `description`, `date_created`, `due_date`, `labels_id`, `archived`, `ticket_id`, `attachment`, `created_at`, `updated_at`) VALUES
+(1, 5, 'System Bug', 'To be fixed ASAP', '2023-05-27', NULL, 8, 0, 1, NULL, '2023-05-26 20:04:04', '2023-05-26 20:04:04'),
+(2, 5, 'Production Bug', 'To be fixed ASAP!', '2023-05-27', NULL, 8, 0, 2, NULL, '2023-05-26 20:13:33', '2023-05-26 20:13:33');
 
 -- --------------------------------------------------------
 
@@ -168,6 +171,14 @@ CREATE TABLE `checklists` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `checklists`
+--
+
+INSERT INTO `checklists` (`id`, `cards_id`, `description`, `created_at`, `updated_at`) VALUES
+(1, 7, 'Accounting', '2023-05-26 01:12:18', '2023-05-26 01:28:00'),
+(2, 7, 'HRMS', '2023-05-26 01:29:20', '2023-05-26 01:29:20');
+
 -- --------------------------------------------------------
 
 --
@@ -183,6 +194,16 @@ CREATE TABLE `checklist_items` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `checklist_items`
+--
+
+INSERT INTO `checklist_items` (`id`, `checklists_id`, `description`, `completed`, `date_finished`, `created_at`, `updated_at`) VALUES
+(2, 1, 'aseraser', 1, '2023-05-26', '2023-05-26 01:25:22', '2023-05-26 01:27:48'),
+(5, 1, 'sdsd', 0, NULL, '2023-05-26 01:39:34', '2023-05-26 01:39:34'),
+(4, 1, 'testse', 1, '2023-05-26', '2023-05-26 01:27:43', '2023-05-26 01:39:30'),
+(6, 2, '1111', 0, NULL, '2023-05-26 01:40:05', '2023-05-26 01:40:05');
 
 -- --------------------------------------------------------
 
@@ -232,10 +253,9 @@ CREATE TABLE `labels` (
 INSERT INTO `labels` (`id`, `name`, `colors_id`, `created_at`, `updated_at`) VALUES
 (1, 'Done', 1, '2019-03-23 04:49:49', '2019-03-23 04:49:49'),
 (2, 'In-process', 2, '2019-03-23 04:49:49', '2019-03-23 04:49:49'),
-(3, 'Stuck', 4, '2019-03-31 08:03:13', '2019-03-31 08:03:13'),
-(4, 'Pending', 7, '2019-03-31 08:04:09', '2019-04-07 04:12:12'),
-(7, 'Back Job', 3, '2019-04-13 04:01:58', '2019-04-13 04:01:58'),
-(6, 'Testing', 8, '2019-04-02 06:00:01', '2019-04-13 04:01:40');
+(3, 'Pending', 4, '2019-03-31 08:03:13', '2023-05-24 07:17:56'),
+(4, 'For QA', 7, '2019-03-31 08:04:09', '2019-04-07 04:12:12'),
+(8, 'Bug', 5, '2023-05-25 17:39:29', '2023-05-25 17:39:29');
 
 -- --------------------------------------------------------
 
@@ -306,6 +326,52 @@ INSERT INTO `permissions` (`id`, `name`, `created_at`, `updated_at`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` int(11) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `created_at` timestamp NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(1, 'Support', '2023-05-26 01:26:31', '2023-05-26 01:26:48'),
+(2, 'Developer', '2023-05-26 01:26:31', '2023-05-26 01:26:48'),
+(3, 'QA', '2023-05-26 01:26:31', '2023-05-26 01:26:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tickets`
+--
+
+CREATE TABLE `tickets` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` longtext NOT NULL,
+  `board_list_id` int(11) NOT NULL,
+  `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `tickets`
+--
+
+INSERT INTO `tickets` (`id`, `name`, `description`, `board_list_id`, `date`, `created_at`, `updated_at`) VALUES
+(1, 'System Bug', 'To be fixed ASAP', 5, '2023-05-27 00:00:00', '2023-05-26 20:04:04', '2023-05-26 20:04:04'),
+(2, 'Production Bug', 'To be fixed ASAP!', 5, '2023-05-27 00:00:00', '2023-05-26 20:13:33', '2023-05-26 20:13:33');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -325,8 +391,31 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
 (1, 'Journey Dagoc', 'jmdhagz@gmail.com', '$2y$10$C.vBDgWeWGmW6wrvl7BgJOmYKPdIYlmQkHFT9tNql01Qsuo1MJUq2', '8ooyxr18ElK8FE90fPCXSsd1YOiUulii0LxkWCYCsFxJGHyB6G2HCXoUpOXt', '2019-09-21 04:07:42', '2019-09-21 04:07:42'),
-(2, 'Theresa Bacala', 'jmdagoc@gmail.com', '$2y$10$733Pk9.O14f1yfL7K9xhMOpOnredIRsOE.9Ei42DcYStUAIKs8yo2', NULL, '2019-10-08 06:41:00', '2019-10-08 06:41:00'),
+(4, 'Jeffrey Way', 'jeffreyway@gmail.com', '$2y$10$wuhmavyxh.V3uN4aP9rXveXkwTCku4Yq.Xtptv3HsSJCn5jv4B6tG', NULL, '2023-05-26 18:47:26', '2023-05-26 18:47:26'),
 (3, 'John Doe', 'johndoe@gmail.com', '$2y$10$Q959ybBnGL2HjM3z9uXLSeDETLM2FsfpqC2chZFfv79D3AANVy9CS', NULL, '2019-10-14 05:48:21', '2019-10-14 05:48:21');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_roles`
+--
+
+CREATE TABLE `user_roles` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `user_roles`
+--
+
+INSERT INTO `user_roles` (`id`, `user_id`, `role_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, '2023-05-26 01:27:58', '2023-05-26 01:28:08'),
+(2, 1, 3, '2023-05-26 06:02:37', '2023-05-26 06:02:48'),
+(4, 4, 1, '2023-05-26 06:02:37', '2023-05-26 06:02:48');
 
 --
 -- Indexes for dumped tables
@@ -411,11 +500,29 @@ ALTER TABLE `permissions`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tickets`
+--
+ALTER TABLE `tickets`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`);
+
+--
+-- Indexes for table `user_roles`
+--
+ALTER TABLE `user_roles`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -426,66 +533,98 @@ ALTER TABLE `users`
 --
 ALTER TABLE `assignments`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `boards`
 --
 ALTER TABLE `boards`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 --
 -- AUTO_INCREMENT for table `board_lists`
 --
 ALTER TABLE `board_lists`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
 --
 -- AUTO_INCREMENT for table `board_members`
 --
 ALTER TABLE `board_members`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
 --
 -- AUTO_INCREMENT for table `cards`
 --
 ALTER TABLE `cards`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `card_assignees`
 --
 ALTER TABLE `card_assignees`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `checklists`
 --
 ALTER TABLE `checklists`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 --
 -- AUTO_INCREMENT for table `checklist_items`
 --
 ALTER TABLE `checklist_items`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
 --
 -- AUTO_INCREMENT for table `colors`
 --
 ALTER TABLE `colors`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
 --
 -- AUTO_INCREMENT for table `labels`
 --
 ALTER TABLE `labels`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
 --
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tickets`
+--
+ALTER TABLE `tickets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `user_roles`
+--
+ALTER TABLE `user_roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
