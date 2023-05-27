@@ -19,9 +19,12 @@ class BoardMemberPolicy
      */
     public function view(User $user, BoardMember $boardMember, $id)
     {
+        // echo $boardMember;
+        // exit();
         $boardMember = BoardMember::where('boards_id', '=', $id)
                                 ->where('board_members.users_id', '=', $user->id)
                                 ->select('users_id')->get()->last();
+
         return $user->id == $boardMember->users_id;
     }
 

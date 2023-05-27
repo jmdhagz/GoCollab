@@ -2,11 +2,11 @@
 	<div>
 		<nav class="navbar navbar-light">
 			<span class="navbar-brand mb-0 h1" style="color: white;">
-				<font-awesome-icon icon="archive"></font-awesome-icon> Archive
+				<b-icon-archive></b-icon-archive> Archive
 			</span>
 			<span class="navbar-text">
 				<b-button style="background-color: #b63c30 !important; border: #b63c30 !important;" v-b-tooltip.hover title="Board List" @click="goBoardList()">
-					<font-awesome-icon icon="long-arrow-alt-left" /> Back
+					<b-icon-arrow-left></b-icon-arrow-left> Back
 				</b-button>
 			</span>
 		</nav>

@@ -12,30 +12,31 @@ window.Vue = require('vue');
 import Vue from 'vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import BootstrapVue from 'bootstrap-vue'
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
 var VueTruncate = require('vue-truncate-filter')
-import { library } from '@fortawesome/fontawesome-svg-core'
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-import { faCalendarAlt, faMapMarkerAlt, faBackspace, faTag, faColumns, faAlignJustify, faPencilAlt, faCheck, faBan, faPlus, faCalendarCheck, faTasks, faTimes, faTrashAlt, faArchive, faClock, faIdBadge, faStar, faEye, faEllipsisH, faLongArrowAltLeft, faUndo, faImages, faUsers } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
 import datePicker from 'vue-bootstrap-datetimepicker';
-import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
-import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
+// import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
 import Autocomplete from 'vuejs-auto-complete'
+// import Autocomplete from '@trevoreyre/autocomplete-vue'
+// import '@trevoreyre/autocomplete-vue/dist/style.css'
  
 // Global registration
 
-library.add(faCalendarAlt, faMapMarkerAlt, faBackspace, faTag, faColumns, faAlignJustify, faPencilAlt, faCheck, faBan, faPlus, faCalendarCheck, faTasks, faTimes, faTrashAlt, faArchive, faClock, faIdBadge, faStar, faEye, faEllipsisH, faLongArrowAltLeft, faUndo, faImages, faUsers)
-Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.config.productionTip = false;
+Vue.use(BootstrapVue)
 Vue.use(VueTruncate)
 Vue.use(VueAxios, axios)
 Vue.use(VueSweetalert2);
-Vue.use(BootstrapVue);
+Vue.use(BootstrapVueIcons)
 Vue.use(datePicker);
+// Vue.use(Autocomplete)
 Vue.use(require('vue-moment'));
 
 /**
@@ -44,6 +45,7 @@ Vue.use(require('vue-moment'));
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+// Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('example', require('./components/Example.vue'));
 Vue.component('home', require('./components/Home.vue'));
 Vue.component('boardlist', require('./components/BoardList.vue'));
@@ -53,7 +55,8 @@ Vue.component('board', require('./components/Board.vue'));
 Vue.component('archive', require('./components/Archive.vue'));
 Vue.component('archivenavbar', require('./components/ArchiveNavbar.vue'));
 Vue.component('dashboardnav', require('./components/DashboardNav.vue'));
-Vue.component('vue-bootstrap-typeahead', VueBootstrapTypeahead)
+Vue.component('support', require('./components/Support.vue'));
+// Vue.component('vue-bootstrap-typeahead', VueBootstrapTypeahead)
 Vue.component('autocomplete', Autocomplete)
 
 

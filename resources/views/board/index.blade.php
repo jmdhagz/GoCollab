@@ -11,6 +11,6 @@
 			Welcome, {{ Auth::user()->name }}!
 		</span>
 	</nav>
-	<board :boardlist="{{ $board_list }}" :starredboardlist="{{ $starred_board_list }}"></board>
+	<board :boardlist="{{ $board_list }}"></board>
 </div>
 @endsection

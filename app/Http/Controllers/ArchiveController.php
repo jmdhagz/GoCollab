@@ -108,7 +108,31 @@ class ArchiveController extends Controller
     	$update_card -> archived = 1;
     	$update_card -> save();
 
-    	return response()->json($update_card);
+    	return $this->getCards($request->boardId);
+    }
+
+    private function getCards($id)
+    {
+        $board_info = Board::find($id);
+        $board_lists = BoardList::where('boards_id', '=', $id)
+                                ->where('archived', '=', 0)->orderBy('id', 'DESC')->get();
+
+        foreach ($board_lists as $list) {
+            $list->card_lists = Card::leftJoin('labels', 'cards.labels_id', '=','labels.id')
+                            ->leftJoin('colors', 'labels.colors_id', 'colors.id')
+                            ->where('cards.board_lists_id', $list->id)
+                            ->where('cards.archived', '=', 0)
+                            ->select(['cards.id', 'cards.board_lists_id', 'cards.card_name', 'cards.description', 'cards.date_created', 'colors.color_name', 'cards.labels_id', 'labels.name', 'cards.due_date', 'cards.attachment'])->get();
+
+            foreach ($list->card_lists as $card) {
+                $card->checklists = Checklist::where('cards_id', $card->id)->get();
+                foreach ($card->checklists as $checklist) {
+                    $checklist->lists = ChecklistItem::where('checklists_id', $checklist->id)->get();
+                }
+            }
+        }
+
+        return $board_lists;
     }
 
     public function newAttachment(Request $request)

@@ -32,13 +32,31 @@ class BoardListController extends Controller
     public function index(BoardMember $boardMember, $id)
     {
         $this->authorize('view', [$boardMember, $id]);
-        $board_info = Board::where('id', '=', $id)->get()->last();
+        $user_info = \Auth::user();
+        $board_info = Board::find($id);
         $board_lists = BoardList::where('boards_id', '=', $id)
                                 ->where('archived', '=', 0)->orderBy('id', 'DESC')->get();
+
+        foreach ($board_lists as $list) {
+            $list->card_lists = Card::leftJoin('labels', 'cards.labels_id', '=','labels.id')
+                            ->leftJoin('colors', 'labels.colors_id', 'colors.id')
+                            ->where('cards.board_lists_id', $list->id)
+                            ->where('cards.archived', '=', 0)
+                            ->select(['cards.id', 'cards.board_lists_id', 'cards.card_name', 'cards.description', 'cards.date_created', 'colors.color_name', 'cards.labels_id', 'labels.name', 'cards.due_date', 'cards.attachment'])->get();
+
+            foreach ($list->card_lists as $card) {
+                $card->checklists = Checklist::where('cards_id', $card->id)->get();
+                foreach ($card->checklists as $checklist) {
+                    $checklist->lists = ChecklistItem::where('checklists_id', $checklist->id)->get();
+                }
+            }
+        }
+        // return $board_lists;
     	$card_lists = Card::leftJoin('labels', 'cards.labels_id', '=','labels.id')
     						->leftJoin('colors', 'labels.colors_id', 'colors.id')
                             ->where('cards.archived', '=', 0)
     						->select(['cards.id', 'cards.board_lists_id', 'cards.card_name', 'cards.description', 'cards.date_created', 'colors.color_name', 'cards.labels_id', 'labels.name', 'cards.due_date', 'cards.attachment'])->get();
+
     	$label_lists = Label::join('colors', 'labels.colors_id', 'colors.id')
     						->select(['labels.id', 'labels.name', 'colors.color_name'])->get();
     	$color_lists = Color::all();
@@ -46,35 +64,59 @@ class BoardListController extends Controller
         $checklist_items = ChecklistItem::all();
         $card_attachment = Card::where('archived', '=', 0)
                                 ->select(['id', 'attachment'])->get();
+
         $board_member_list = BoardMember::join('users', 'board_members.users_id', '=', 'users.id')
                                         ->where('board_members.boards_id', '=', $id)
                                         ->select(['users.id', 'board_members.id as board_members_id', 'users.name', 'board_members.permissions_id', 'board_members.is_owner', 'board_members.date_joined'])->get();
+
         $members_arr = [];
         foreach ($board_member_list as $board_member) {
             $members_arr[] = $board_member -> id;
         }
         $user_list = User::whereNotIn('id', $members_arr)->select(['id', 'name'])->get();
         $permission_list = Permission::all();
-        return view('home.index', compact('board_lists', 'card_lists', 'label_lists', 'color_lists', 'check_lists', 'checklist_items', 'board_info', 'id', 'card_attachment', 'board_member_list', 'permission_list', 'user_list'));
+        
+        return view('home.index', compact('board_lists', 'card_lists', 'label_lists', 'color_lists', 'check_lists', 'checklist_items', 'board_info', 'id', 'card_attachment', 'board_member_list', 'permission_list', 'user_list', 'user_info'));
     }
 
-    public function getCards($id)
+    private function getCards($id)
     {
-        $board_info = Board::where('id', '=', $id)->get()->last();
-    	$board_lists = BoardList::where('boards_id', '=', $id)
+        $board_info = Board::find($id);
+        $board_lists = BoardList::where('boards_id', '=', $id)
                                 ->where('archived', '=', 0)->orderBy('id', 'DESC')->get();
-    	$card_lists = Card::leftJoin('labels', 'cards.labels_id', '=','labels.id')
+
+        foreach ($board_lists as $list) {
+            $list->card_lists = Card::leftJoin('labels', 'cards.labels_id', '=','labels.id')
                             ->leftJoin('colors', 'labels.colors_id', 'colors.id')
+                            ->where('cards.board_lists_id', $list->id)
                             ->where('cards.archived', '=', 0)
                             ->select(['cards.id', 'cards.board_lists_id', 'cards.card_name', 'cards.description', 'cards.date_created', 'colors.color_name', 'cards.labels_id', 'labels.name', 'cards.due_date', 'cards.attachment'])->get();
-    	$label_lists = Label::join('colors', 'labels.colors_id', 'colors.id')
-    						->select(['labels.id', 'labels.name', 'colors.color_name'])->get();
-		$color_lists = Color::all();
-        $check_lists = Checklist::all();
-        $checklist_items = ChecklistItem::all();
-        $card_attachment = Card::where('archived', '=', 0)
-                                ->select(['id', 'attachment'])->get();
-    	return response()->json(['card_lists' => $card_lists, 'board_lists' => $board_lists, 'label_lists' => $label_lists, 'color_lists' => $color_lists, 'check_lists' => $check_lists, 'checklist_items' => $checklist_items, 'board_info' => $board_info, 'card_attachment' => $card_attachment]);
+
+            foreach ($list->card_lists as $card) {
+                $card->checklists = Checklist::where('cards_id', $card->id)->get();
+                foreach ($card->checklists as $checklist) {
+                    $checklist->lists = ChecklistItem::where('checklists_id', $checklist->id)->get();
+                }
+            }
+        }
+
+        return $board_lists;
+    }
+
+    private function getLists($data)
+    {
+        $card = Card::leftJoin('labels', 'cards.labels_id', '=','labels.id')
+                            ->leftJoin('colors', 'labels.colors_id', 'colors.id')
+                            ->where('cards.id', $data->cardId)
+                            ->where('cards.archived', '=', 0)
+                            ->select(['cards.id', 'cards.board_lists_id', 'cards.card_name', 'cards.description', 'cards.date_created', 'colors.color_name', 'cards.labels_id', 'labels.name', 'cards.due_date', 'cards.attachment'])->get()->last();
+
+        $card->checklists = Checklist::where('cards_id', $card->id)->get();
+        foreach ($card->checklists as $checklist) {
+            $checklist->lists = ChecklistItem::where('checklists_id', $checklist->id)->get();
+        }
+
+        return $card;
     }
 
     public function newAttachment(Request $request)
@@ -86,12 +128,13 @@ class BoardListController extends Controller
             $file_name = $uploadedImage->getClientOriginalName(); 
             $uploadedImage->move($destination_path, $file_name);
 
-            $put_image = Card::find($request -> card_id);
+            $put_image = Card::find($request -> cardId);
             $put_image -> attachment = 'images/'.$file_name;
             $put_image -> save();
-        }
 
-        return response()->json($put_image);
+            // return $this->getCards($request->id);
+            return response()->json(['board_list' => $this->getCards($request->id), 'card' => $this->getLists($request)]);
+        }
     }
 
     public function removeAttachment(Request $request) 
@@ -100,7 +143,7 @@ class BoardListController extends Controller
         $remove_attachment -> attachment = '';
         $remove_attachment -> save();
 
-        return response()->json($remove_attachment);
+        return response()->json(['board_list' => $this->getCards($request->boardId), 'card' => $this->getLists($request)]);
     }
 
     public function changeList(Request $request)
@@ -109,7 +152,8 @@ class BoardListController extends Controller
     	$update_card -> board_lists_id = $request -> listId;
     	$update_card -> save();
 
-    	return response()->json($update_card);
+        return $this->getCards($request->boardId);
+    	// return response()->json($update_card);
     }
 
     public function newList(Request $request)
@@ -121,22 +165,22 @@ class BoardListController extends Controller
     	$new_list -> archived = 0;
     	$new_list -> save();
 
-    	return response()->json($new_list);
+    	return $this->getCards($request->id);
     }
 
     public function newCard(Request $request)
     {
     	$new_card = new Card();
     	$new_card -> board_lists_id = $request -> listId;
-    	$new_card -> card_name = $request -> cardName;
-    	$new_card -> description = $request -> cardDesc;
+    	$new_card -> card_name = $request->card['name'];
+    	$new_card -> description = $request->card['description'];
     	$new_card -> date_created = date('Y-m-d');
     	$new_card -> due_date = NULL;
     	$new_card -> labels_id = 0;
     	$new_card -> archived = 0;
     	$new_card -> save();
 
-    	return response()->json($new_card);
+    	return $this->getCards($request->boardId);
     }
 
     public function addLabel(Request $request)
@@ -154,7 +198,9 @@ class BoardListController extends Controller
     					->where('board_lists.id', '=', $card_label -> board_lists_id)
     					->select(['board_lists.list_name'])->get()->last();
 
-    	return response()->json(['card_label' => $card_label, 'card_info' => $card_info, 'list_name' => $list_info -> list_name]);
+        return response()->json(['board_list' => $this->getCards($request->boardId), 'card' => $this->getLists($request)]);
+
+    	// return response()->json(['card_label' => $card_label, 'card_info' => $card_info, 'list_name' => $list_info -> list_name, 'board_list' => $this->getCards($request->boardId)]);
     }
 
     public function newLabel(Request $request)
@@ -218,7 +264,7 @@ class BoardListController extends Controller
         $new_checklist -> description = $request -> checkListName;
         $new_checklist -> save();
 
-        return response()->json($new_checklist);
+        return response()->json(['board_list' => $this->getCards($request->boardId), 'card' => $this->getLists($request)]);
     }
 
     public function newChecklistItem(Request $request)
@@ -230,7 +276,7 @@ class BoardListController extends Controller
         $new_checklist_item -> date_finished = NULL;
         $new_checklist_item -> save();
 
-        return response()->json($new_checklist_item);
+        return response()->json(['board_list' => $this->getCards($request->boardId), 'card' => $this->getLists($request)]);
     }
 
     public function changeListItem(Request $request)
@@ -248,7 +294,7 @@ class BoardListController extends Controller
             $update_list_item -> save();
         }
 
-        return response()->json($update_list_item);
+        return response()->json(['board_list' => $this->getCards($request->boardId), 'card' => $this->getLists($request)]);
     }
 
     public function renameChecklist(Request $request)
@@ -274,7 +320,7 @@ class BoardListController extends Controller
         $delete_checklist_item = ChecklistItem::find($request -> listItemId);
         $delete_checklist_item -> delete();
 
-        return response()->json($delete_checklist_item);
+        return response()->json(['board_list' => $this->getCards($request->boardId), 'card' => $this->getLists($request)]);
     }
 
     public function deleteChecklist(Request $request)
@@ -290,7 +336,7 @@ class BoardListController extends Controller
             $remove_items -> delete();
         }
 
-        return response()->json($delete_checklist);
+        return response()->json(['board_list' => $this->getCards($request->boardId), 'card' => $this->getLists($request)]);
     }
 
     public function boardNewName(Request $request)
@@ -304,39 +350,54 @@ class BoardListController extends Controller
 
     public function archiveBoard(Request $request)
     {
-        $board_id = $request -> boardId;
-
-        $edit_board = BoardList::find($board_id);
+        $edit_board = BoardList::find($request->listId);
         $edit_board -> archived = 1;
         $edit_board -> save();
 
-        $check_board_card_list = Card::where('board_lists_id', '=', $board_id)
+        $check_board_card_list = Card::where('board_lists_id', '=', $request->listId)
                                     ->select(['id'])->get();
 
         foreach ($check_board_card_list as $check_board_card) {
-            $edit_card = Card::find($check_board_card -> id);
-            $edit_card -> archived = 1;
-            $edit_card -> save();
+            $check_board_card->archived = 1;
+            $check_board_card->save();
         }
 
-        return response()->json($edit_board);
+        return $this->getCards($request->boardId);
     }
 
     public function deleteBoardList(Request $request)
     {
-        $board_id = $request -> boardId;
-        $card_lists = Card::where('board_lists_id', '=', $board_id)
+        $card_lists = Card::where('board_lists_id', '=', $request->listId)
                             ->select(['id'])->get();
 
-        $delete_board = BoardList::find($board_id);
-        $delete_board -> delete();
-
         foreach ($card_lists as $card) {
-            $delete_cards = Card::find($card -> id);
-            $delete_cards -> delete();
+            $card->delete();
         }
 
-        return response()->json($delete_board);
+        $delete_board = BoardList::find($request->listId);
+        $delete_board->delete();
+
+        return $this->getCards($request->boardId);
+    }
+
+    public function deleteCard(Request $request)
+    {
+        $card = Card::find($request->card['id']);
+
+        $checklists = Checklist::where('cards_id', $card->id)->get();
+        foreach ($checklists as $checklist) {
+            
+            $checklist_items = ChecklistItem::where('checklists_id', $checklist->id)->get();
+            foreach ($checklist_items as $checklist_item) {
+                $checklist_item->delete();
+            }
+
+            $checklist->delete();
+        }
+
+        $card->delete();
+        
+        return $this->getCards($request->boardId);
     }
 
     public function addBoardMember(Request $request)

@@ -4,36 +4,7 @@
 			<div class="row">
 				<div class="col-md-12">
 					<div class="scroll-wrapper">
-						<div class="modified-card col-md-3" v-for="lists of board_lists">
-							<div class="card card_scroll">
-								<div class="card-body">
-									<h5 class="card-title" style="font-family: AileronRegular;">
-										<strong>{{ lists.list_name }}</strong>
-										<font-awesome-icon class="float-right" icon="ellipsis-h" v-b-modal.listSettingModal @click="selectedList(lists)"></font-awesome-icon>
-									</h5>
-									<draggable :card_lists="card_lists" animation="200" group="card_lists" @add="onAdd($event, lists)">
-										<div class="card" v-for="card of card_lists" v-if="card.board_lists_id === lists.id" :key="card.id" :cardId="card.id" style="margin-bottom: 10px; border-radius: 0.5rem; box-shadow: 0 8px 8px -5px rgba(0, 0, 0, 0.2);" @click="selectedCard(card, lists.list_name)" v-b-modal.visitcardmodal>
-											<img :src="'../' +card.attachment" class="card-img-top" alt="" style="box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 8px -8px">
-											<div class="card-body">
-												<template v-if="card.labels_id != 0">
-													<div :style="{ 'background-color': card.color_name }" class="labelStyle">&nbsp;</div>	
-												</template>
-												<p class="cardText">{{ card.card_name }}</p>
-												<template v-if="card.due_date != null">
-													<p style="font-family: AileronRegular; margin-bottom: 0px; font-size: 15px; color: #798D99;">
-														<font-awesome-icon icon="clock"></font-awesome-icon> {{ card.due_date | moment('MMMM Do') }}
-													</p>
-												</template>
-											</div>
-										</div>
-									</draggable>
-									<div style="margin-top: 20px;">
-										<b-button v-b-modal.newcardmodal @click="selectedListId(lists.id)" variant="secondary" class="col-md-12">Add a card</b-button>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="modified-card col-md-3">
+						<div class="modified-card col-md-2">
 							<div class="card" style="background-color: #DFE3E6;">
 								<div class="card-body">
 									<h5 class="card-title" style="font-family: AileronRegular;"><strong>New Card</strong></h5>
@@ -43,6 +14,35 @@
 											<button class="btn btn-outline-primary col-md-12" style="margin-top: 10px;">Save</button>
 										</div>
 									</form>
+								</div>
+							</div>
+						</div>
+						<div class="modified-card col-md-2" v-for="lists of board_lists">
+							<div class="card card_scroll">
+								<div class="card-body">
+									<h5 class="card-title" style="font-family: AileronRegular;">
+										<strong>{{ lists.list_name }}</strong>
+										<b-icon-gear class="float-right" v-b-modal.listSettingModal @click="selectedList(lists)"></b-icon-gear>
+									</h5>
+									<draggable :card_lists="lists.card_lists" animation="200" group="card_lists" @add="onAdd($event, lists)">
+										<div class="card" v-for="card of lists.card_lists" :key="card.id" :cardId="card.id" style="margin-bottom: 10px; border-radius: 0.5rem; box-shadow: 0 8px 8px -5px rgba(0, 0, 0, 0.2);" @click="selectedCard(card, lists.list_name)" v-b-modal.visitcardmodal>
+											<img :src="'../' +card.attachment" class="card-img-top" alt="" style="box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 8px -8px">
+											<div class="card-body">
+												<template v-if="card.labels_id != 0">
+													<div :style="{ 'background-color': card.color_name }" class="labelStyle">&nbsp;</div>	
+												</template>
+												<p class="cardText">{{ card.card_name }}</p>
+												<template v-if="card.due_date != null">
+													<p style="font-family: AileronRegular; margin-bottom: 0px; font-size: 15px; color: #798D99;">
+														{{ card.due_date | moment('MMMM Do') }}
+													</p>
+												</template>
+											</div>
+										</div>
+									</draggable>
+									<div style="margin-top: 20px;">
+										<b-button v-b-modal.newcardmodal @click="selectedListId(lists.id)" variant="secondary" class="col-md-12">Add a card</b-button>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -70,11 +70,11 @@
 			<form @submit.prevent="newCard()">
 				<div class="form-group" style="margin-top: 10px;">
 					<label>Card Name</label>
-					<input type="text" class="form-control" v-model="new_card" required>
+					<input type="text" class="form-control" v-model="new_card.name" required>
 				</div>
 				<div class="form-group">
 					<label>Description</label>
-					<textarea cols="10" rows="5" v-model="new_card_desc" class="form-control" required></textarea>
+					<textarea cols="10" rows="5" v-model="new_card.description" class="form-control" required></textarea>
 				</div>
 				<div class="form-group">
 					<b-btn variant="primary" type="submit" style="margin-top: 10px;" block>Save</b-btn>
@@ -84,35 +84,24 @@
 		
 		<!-- Visited Card Modal -->
 		<b-modal id="visitcardmodal" centered ref="visitcardmodal" size="xl" hide-header hide-footer>
-			<div class="row" style="margin-top: 30px;">
+			<div class="row p-4 mt-4">
 				<div class="col-md-9">
-					<div style="padding: 1em; width: 100%;">
+					<div style="width: 100%;">
 						<table width="100%">	
 							<tr>
-								<td width="5%">
-									<h2><font-awesome-icon icon="columns"></font-awesome-icon></h2>
-								</td>
-								<td width="95%">
-									<h2 style="font-family: AileronRegular;">{{ selected_card.card_name }}</h2>
-									
-								</td>
-							</tr>
-							<tr>
-								<td>&nbsp;</td>
 								<td>
-									<b-badge pill variant="info">{{ selected_card_name }}</b-badge>
+									<small>{{ selected_card_name }}</small>
+									<h2 style="font-family: AileronRegular;">{{ selected_card.card_name }}</h2>
 								</td>
 							</tr>
 						</table>
+						<hr>
 					</div>
 					<!-- Description -->
-					<div style="padding: 1em; width: 100%;">
+					<div style="width: 100%;">
 						<table width="100%">	
 							<tr>
-								<td width="5%">
-									<h4><font-awesome-icon icon="align-justify"></font-awesome-icon></h4>
-								</td>
-								<td width="95%">
+								<td>
 									<h5 style="font-family: AileronRegular;">
 										<strong>Description</strong> 
 										<button class="btn btn-sm btn-outline-secondary float-right" v-show="modifyDescBtn" @click="hiddenEditDesc = !hiddenEditDesc, cancelDescBtn = !cancelDescBtn, modifyDescBtn = !modifyDescBtn">Modify</button>
@@ -121,11 +110,10 @@
 								</td>
 							</tr>
 							<tr>
-								<td>&nbsp;</td>
 								<td>
 									<template v-if="selected_card.description != ''">
 										<div style="margin-top: 20px;">
-											<p v-show="!hiddenEditDesc">{{ selected_card.description }}</p>
+											<p style="font-family: AileronRegular;" v-show="!hiddenEditDesc">{{ selected_card.description }}</p>
 										</div>
 									</template>
 									<template v-else>
@@ -146,146 +134,119 @@
 						</table>
 					</div>
 					<!-- Attachment -->
-					<div v-for="card_attachment in card_attachment_list">
-						<div v-if="card_attachment.id == selected_card.id">
-							<template v-if="card_attachment.attachment != ''">
-								<div style="padding: 1em; width: 100%;">
-									<table width="100%">	
-										<tr>
-											<td width="5%">
-												<h4><font-awesome-icon icon="images"></font-awesome-icon></h4>
-											</td>
-											<td width="95%">
-												<h5 style="font-family: AileronRegular;">
-													<strong>Cover</strong> 
-												</h5>
-											</td>
-										</tr>
-										<tr>
-											<td width="5%">&nbsp;</td>
-											<template v-if="card_attachment.attachment">
-												<td width="95%">
-													<div class="card">
-														<img :src="'../' + card_attachment.attachment" class="card-img-top">
-													</div>
-												</td>
-											</template>
-										</tr>
-									</table>
-								</div>	
-							</template>
-							<template v-else>
-								
-							</template>
-						</div>
-					</div>
+					<template v-if="selected_card.attachment == null || selected_card.attachment == ''">
+					</template>
+
+					<template v-else>
+						<table width="100%">	
+							<tr>
+								<td>
+									<h5 style="font-family: AileronRegular;">
+										<strong>Attachment</strong> 
+									</h5>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="card">
+										<img :src="'../' + selected_card.attachment" class="card-img-top">
+									</div>
+								</td>
+							</tr>
+						</table>
+					</template>
 					<!-- End of Description -->
 					<!-- Checklist -->
-					<div style="padding: 1em; width: 100%;">
-						<div v-for="(check_list, index) in check_lists">
-							<div v-if="check_list.cards_id == selected_card.id">
+					<div style="width: 100%;" class="mt-5">
+						<template v-if="selected_card.checklists">
+							<h5 style="font-family: AileronRegular;"><strong>Checklist</strong></h5>
+							<template v-for="(checklist, index) in selected_card.checklists">
 								<!-- Checlist Name -->
 								<table width="100%" style="margin-top: 20px;">
 									<tr>
-										<td width="5%" style="vertical-align: top;">
-											<h4><font-awesome-icon icon="tasks"></font-awesome-icon></h4>
-										</td>
-										<td width="95%">
-											<h5 style="font-family: AileronRegular;" @click="toggleChecklistDesc(index)">
-												<strong>{{ check_list.description }}</strong>
-											</h5>
+										<td>
+											<p style="font-family: AileronRegular;" class="mb-2" @click="toggleChecklistDesc(index)">
+												<strong>{{ checklist.description }}</strong>
+											</p>
 											<div v-show="hiddenEditChecklistDesc[index]">
 												<div class="form-group">
-													<input type="text" class="form-control" v-model="check_list.description">
+													<input type="text" class="form-control" v-model="checklist.description">
 												</div>
 												<div class="form-group">
-													<b-button variant="success" size="sm" @click="renameChecklist(check_list, index)">Save</b-button>
-													<b-button variant="outline-secondary" size="sm" @click="closeEditListDesc(index)">
-														<font-awesome-icon icon="times"></font-awesome-icon>
-													</b-button>
+													<b-button variant="success" size="sm" @click="renameChecklist(checklist, index)">Save Changes</b-button>
+													<b-button variant="outline-secondary" size="sm" @click="closeEditListDesc(index)">Cancel</b-button>
 												</div>
 											</div>
 										</td>
 									</tr>
 								</table>
+
 								<!-- Checklist Item -->
 								<table width="100%" style="margin-top: 20px;">
-									<tr v-for="(checklist_item, listIndex) of checklist_items" v-if="checklist_item.checklists_id == check_list.id">
+									<tr v-for="(list, listIndex) of checklist.lists">
 										<td width="5%" style="padding-left: 8px; padding-bottom: 20px; padding-top: 6px; vertical-align: top;">
 											<label class="checkboxContainer">
-												<input type="checkbox" v-if="checklist_item.completed == 1" @click="checkBoxToogle(checklist_item.id, $event)" checked>
-												<input type="checkbox" v-else @click="checkBoxToogle(checklist_item.id, $event)">
+												<input type="checkbox" v-if="list.completed == 1" @click="checkBoxToogle(list.id, $event)" checked>
+												<input type="checkbox" v-else @click="checkBoxToogle(list.id, $event)">
 												<span class="checkmark"></span>
 											</label>
 										</td>
 										<td v-show="!hiddenEditItemItem[listIndex]" width="90%" style="padding-bottom: 20px;" @mouseover="listMouseOver(listIndex)" @click="listItemEdit(listIndex)">
-											<p :class="completed" v-if="checklist_item.completed == 1" style="font-family: AileronRegular; margin-bottom: 0px;">{{ checklist_item.description }}</p>
-											<p v-else style="font-family: AileronRegular; margin-bottom: 0px;">{{ checklist_item.description }}</p>
+											<p :class="completed" v-if="list.completed == 1" style="font-family: AileronRegular; margin-bottom: 0px;">{{ list.description }}</p>
+											<p v-else style="font-family: AileronRegular; margin-bottom: 0px;">{{ list.description }}</p>
 										</td>
 										<td width="90%" style="padding-bottom: 20px;" v-show="hiddenEditItemItem[listIndex]">
 											<div class="form-group">
-												<textarea class="form-control" cols="10" rows="5" v-model="checklist_item.description"></textarea>
+												<textarea class="form-control" cols="10" rows="5" v-model="list.description"></textarea>
 											</div>
 											<div class="form-group">
-												<b-button variant="success" size="sm" @click="saveEditedItemDesc(checklist_item, listIndex)">Save</b-button>
-												<b-button variant="outline-secondary" size="sm" @click="closeEditItemList(listIndex)">
-													<font-awesome-icon icon="times"></font-awesome-icon>
-												</b-button>
+												<b-button variant="success" size="sm" @click="saveEditedItemDesc(list, listIndex)">Save Changes</b-button>
+												<b-button variant="outline-secondary" size="sm" @click="closeEditItemList(listIndex)">Cancel</b-button>
 											</div>
 										</td>
 										<td width="5%" style="vertical-align: top;">
-											<b-button @click="deleteListItem(checklist_item.id)" size="sm" variant="outline-secondary" v-show="hiddenEditItemBtn[listIndex]">
-												<font-awesome-icon icon="trash-alt"></font-awesome-icon>
-											</b-button>
+											<b-button @click="deleteListItem(list.id)" size="sm" variant="danger" v-show="hiddenEditItemBtn[listIndex]"><b-icon-trash2></b-icon-trash2></b-button>
 										</td>
 									</tr>
 								</table>
+
 								<!-- Add Item to checlist -->
 								<table v-show="!newChecklistItemHidden[index]" width="100%" style="margin-top: 20px; margin-bottom: 50px;">
 									<tr>
-										<td width="5%">
-											&nbsp;
-										</td>
-										<td width="95%">
-											<b-button variant="outline-secondary" size="sm" @click="newListItemToggle(index)">Add an item</b-button>
-											<button v-show="!deleteChecklist[index]" class="btn btn-sm btn-outline-danger" @click="deleteChecklistToggle(index)">Delete checklist</button>
+										<td>
+											<b-button variant="outline-primary" size="sm" @click="newListItemToggle(index)">Add item</b-button>
+											<button v-show="!deleteChecklist[index]" class="btn btn-sm btn-danger" @click="deleteChecklistToggle(index)">Delete checklist</button>
 										</td>
 									</tr>
 								</table>
 								<!-- End of adding item to checlist -->
+								
 								<!-- Hidden add item form -->
 								<table v-show="newChecklistItemHidden[index]" width="100%" style="margin-top: 20px;">
 									<tr>
-										<td width="5%">
-											&nbsp;
-										</td>
-										<td width="95%">
+										<td>
 											<div class="form-group">
 												<textarea class="form-control" cols="5" rows="3" v-model="new_checklist_item"></textarea>
 											</div>
 											<div class="form-group">
-												<b-button variant="success" size="sm" @click="saveNewItem(check_list.id)">
-													<font-awesome-icon icon="check"></font-awesome-icon> Save
+												<b-button variant="success" size="sm" @click="saveNewItem(checklist.id)">
+													 Save item
 												</b-button>
-												<b-button variant="outline-secondary" size="sm" @click="closeListItemToggle(index)">
-													<font-awesome-icon icon="times"></font-awesome-icon>
-												</b-button>
+												<b-button variant="outline-secondary" size="sm" @click="closeListItemToggle(index)">Cancel</b-button>
 											</div>
 										</td>
 									</tr>
 								</table>
 								<!-- End of hidden add item form -->
+
 								<!-- Hidden delete checklist container -->
 								<table v-show="deleteChecklist[index]" width="100%" style="margin-top: 20px;">
 									<tr>
-										<td width="5%">
-											&nbsp;
-										</td>
-										<td width="95%">
+										<td>
 											<div class="card border-danger">
 												<div class="card-body text-danger">
 													<h5 class="card-title">Are you sure to delete this checklist?</h5>
-													<button class="btn btn-danger btn-sm" @click="confirmDeleteChecklist(check_list.id, index)">Delete Checklist</button>
+													<button class="btn btn-danger btn-sm" @click="confirmDeleteChecklist(checklist.id, index)">Delete Checklist</button>
 													<button class="btn btn-outline-secondary btn-sm" @click="cancelDeleteList(index)">Cancel</button>
 												</div>
 											</div>
@@ -293,11 +254,8 @@
 									</tr>
 								</table>
 								<!-- End of hidden delete checklist container -->
-							</div>
-							<div v-else>
-
-							</div>
-						</div>
+							</template>
+						</template>
 					</div>
 					<!-- End of Checklist -->
 				</div>
@@ -312,10 +270,10 @@
 							</p>
 						</strong>
 						<div v-if="selected_card.labels_id != 0" :style="{ 'background-color': selected_card.color_name }" class="visitedLabelStyle" v-b-modal.labelsmodal>
-							<font-awesome-icon icon="tag"></font-awesome-icon>&nbsp;&nbsp;&nbsp;{{ selected_card.name }}
+							{{ selected_card.name }}
 						</div>
 						<div v-if="selected_card.labels_id == 0" style="background-color: #aeafb0; text-align: center;" class="visitedLabelStyle" v-b-modal.labelsmodal>
-							<font-awesome-icon icon="tag"></font-awesome-icon>&nbsp;&nbsp;&nbsp;Add label
+							Add label
 						</div>
 					</div>
 					<hr>
@@ -328,14 +286,14 @@
 						</strong>
 						<template v-if="selected_card.due_date">
 							<p style="font-family: AileronRegular;">
-								<font-awesome-icon icon="clock"></font-awesome-icon>&nbsp;&nbsp;&nbsp;{{ selected_card.due_date | moment('MMMM Do YYYY') }} 
+								{{ selected_card.due_date | moment('MMMM Do YYYY') }} 
 								<b-button class="float-right" variant="secondary" v-show="editDueDateHidden" size="sm" @click="editDueDateHidden = !editDueDateHidden, cancelDueDateBtn = !cancelDueDateBtn">Edit</b-button>
 								<b-button class="float-right" variant="outline-danger" v-show="cancelDueDateBtn" size="sm" @click="cancelDueDateBtn = !cancelDueDateBtn, editDueDateHidden = !editDueDateHidden">Cancel</b-button>
 							</p>
 						</template>
 						<template v-else>
 							<b-button variant="secondary" block v-show="createNewDueDateBtn" @click="newDueDateHidden = !newDueDateHidden, createNewDueDateBtn = !createNewDueDateBtn">
-								<font-awesome-icon icon="plus"></font-awesome-icon>&nbsp;&nbsp;&nbsp;Add Due Date
+								Add Due Date
 							</b-button>
 						</template>
 						<div v-show="!editDueDateHidden">
@@ -344,7 +302,7 @@
 							</div>
 							<div class="form-group">
 								<b-button variant="success" size="sm" @click="saveEditedDueDate()">
-									<font-awesome-icon icon="check"></font-awesome-icon> Save Changes
+									Save Changes
 								</b-button>
 							</div>
 						</div>
@@ -354,10 +312,10 @@
 							</div>
 							<div class="form-group">
 								<b-button variant="success" size="sm" @click="saveNewDueDate()">
-									<font-awesome-icon icon="check"></font-awesome-icon> Save Changes
+									Save Changes
 								</b-button>
 								<b-button variant="outline-danger" size="sm" @click="createNewDueDateBtn = !createNewDueDateBtn, newDueDateHidden = !newDueDateHidden">
-									<font-awesome-icon icon="ban"></font-awesome-icon> Cancel
+									Cancel
 								</b-button>
 							</div>
 						</div>
@@ -371,7 +329,7 @@
 							</p>
 						</strong>
 						<b-button variant='secondary' block v-b-modal.newChecklistModal>
-							<font-awesome-icon icon="tasks"></font-awesome-icon> New Checklist
+							New Checklist
 						</b-button>
 					</div>
 					<hr>
@@ -381,16 +339,14 @@
 							<input type="file" class="custom-file-input" @change="fileChange" id="customFile">
 							<label class="custom-file-label" for="customFile">{{ cardImgPreview }}</label>
 						</div>
-						<template v-for="card_attachment in card_attachment_list">
-							<template v-if="card_attachment.id == selected_card.id">
-								<template v-if="card_attachment.attachment">
-									<b-button variant="secondary" block @click="uploadAttachment()" style="margin-top: 10px;">Save</b-button>
-									<b-button variant="danger" block @click="removeAttachment()" style="margin-top: 5px;">Remove</b-button>
-								</template>
-								<template v-else>
-									<b-button variant="primary" block @click="uploadAttachment()" style="margin-top: 10px;">Save</b-button>
-								</template>
-							</template>
+
+						<template v-if="selected_card.attachment == null || selected_card.attachment == ''">
+							<b-button variant="primary" block @click="uploadAttachment()" style="margin-top: 10px;">Save</b-button>
+						</template>
+
+						<template v-else>
+							<b-button variant="secondary" block @click="uploadAttachment()" style="margin-top: 10px;">Save</b-button>
+							<b-button variant="danger" block @click="removeAttachment()" style="margin-top: 5px;">Remove</b-button>
 						</template>
 					</div>
 					<hr>
@@ -398,14 +354,16 @@
 						<h6 style="font-family: AileronRegular;"><strong>ACTIONS</strong></h6>
 					</div>
 					<div>
-						<strong>
-							<p style="font-family: AileronRegular; margin: 0px; padding-bottom: 10px;">
-								Archive
-							</p>
+						<div class="form-group">
 							<b-button variant="secondary" block @click="sendToArchive()">
-								<font-awesome-icon icon="archive"></font-awesome-icon>&nbsp;&nbsp;&nbsp;Archive Card
+								Archive Card
 							</b-button>
-						</strong>
+						</div>
+						<div class="form-group">
+							<b-button variant="outline-danger" block @click="deleteCard()">
+								Delete Card
+							</b-button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -421,7 +379,7 @@
 								<td width="80%" style="padding-bottom: 10px;">
 									<template v-if="selected_card.labels_id != 0">
 										<template v-if="label.id === selected_card.labels_id">
-											<p style="margin: auto; padding: 10px; border-radius: 5px; color: white;" :style="{ 'background-color': label.color_name }" @click="addLabel(label.id)">{{ label.name }}<font-awesome-icon icon="check" style="height: 25px !important;" class="float-right"></font-awesome-icon></p>
+											<p style="margin: auto; padding: 10px; border-radius: 5px; color: white;" :style="{ 'background-color': label.color_name }" @click="addLabel(label.id)">{{ label.name }}</p>
 										</template>
 										<template v-else>
 											<p style="margin: auto; padding: 10px; border-radius: 5px; color: white;" :style="{ 'background-color': label.color_name }" @click="addLabel(label.id)">{{ label.name }}</p>
@@ -432,10 +390,11 @@
 									</template>
 								</td>
 								<td width="10%" v-show="hiddenEditIcons">
-									<font-awesome-icon icon="pencil-alt" @click="selectLabel(label)" style="height: 25px !important;" class="float-right"></font-awesome-icon>
+									<button class="btn" @click="selectLabel(label)">edit</button>
+									<button class="btn" @click="deleteLabel(label.id)">delete</button>
 								</td>
 								<td width="10%" v-show="hiddenEditIcons">
-									<font-awesome-icon icon="backspace" @click="deleteLabel(label.id)" style="height: 25px !important;" class="float-right"></font-awesome-icon>
+									<button class="btn" @click="deleteLabel(label.id)">delete</button>
 								</td>
 							</tr>
 						</template>
@@ -450,10 +409,10 @@
 							<input type="text" class="form-control" v-model="selected_label.name">
 
 							<b-btn variant="outline-primary" @click="saveEditedLabel()" style="margin-top: 5px;">
-								<font-awesome-icon icon="check"></font-awesome-icon> Save Changes
+								Save Changes
 							</b-btn>
 							<b-btn variant="outline-danger" @click="editLabelHidden = !editLabelHidden, hiddenEditIcons = !hiddenEditIcons" style="margin-top: 5px;">
-								<font-awesome-icon icon="ban"></font-awesome-icon> Cancel
+								Cancel
 							</b-btn>
 						</div>
 					</div>
@@ -463,12 +422,12 @@
 					<hr>
 					<div v-show="!newLabelHidden" style="margin-top: 5px;">
 						<b-btn variant="primary" @click="newLabelHidden = !newLabelHidden" block>
-							<font-awesome-icon icon="plus"></font-awesome-icon> New Label
+							New Label
 						</b-btn>
 					</div>
 					<div v-show="newLabelHidden" style="margin-top: 5px;">
 						<b-btn variant="outline-danger" @click="newLabelHidden = !newLabelHidden" block>
-							<font-awesome-icon icon="ban"></font-awesome-icon> Cancel
+							Cancel
 						</b-btn>
 					</div>
 					<div v-show="newLabelHidden" style="margin-top: 20px;">
@@ -500,7 +459,7 @@
 					</div>
 					<div class="form-group">
 						<b-button variant="success" @click="newChecklist()">
-							<font-awesome-icon icon="plus"></font-awesome-icon> Save
+							Save
 						</b-button>
 					</div>
 				</div>
@@ -526,8 +485,7 @@ export default {
 			checklist_items: this.checklistitems,
 			card_attachment_list: this.cardattachment,
 			new_list: '',
-			new_card: '',
-			new_card_desc: '',
+			new_card: {'name' : '', 'description': ''},
 			new_checklist: '',
 			new_checklist_item: '',
 			selected_list_id: '',
@@ -580,25 +538,26 @@ export default {
 			this.popoverShow = false
 		},
 
-		getCards() {
-			axios.get('../board/'+ this.board_id +'/get_cards')
-			.then((response) => {
-				this.card_lists = response.data.card_lists;
-				this.board_lists = response.data.board_lists;
-				this.label_lists = response.data.label_lists;
-				this.check_lists = response.data.check_lists;
-				this.checklist_items = response.data.checklist_items;
-				this.card_attachment_list = response.data.card_attachment;
-			});
-		},
+		// getCards() {
+		// 	axios.get('../board/'+ this.board_id +'/get_cards')
+		// 	.then((response) => {
+		// 		this.card_lists = response.data.card_lists;
+		// 		this.board_lists = response.data.board_lists;
+		// 		this.label_lists = response.data.label_lists;
+		// 		this.check_lists = response.data.check_lists;
+		// 		this.checklist_items = response.data.checklist_items;
+		// 		this.card_attachment_list = response.data.card_attachment;
+		// 	});
+		// },
 
 		updateList(cardId, listId) {
 			axios.post('../board/'+ this.board_id +'/change_list', {
 				cardId: cardId,
-				listId: listId
+				listId: listId,
+				boardId: this.board_id
 			})
 			.then((response) => {
-				this.getCards();
+				this.board_lists = response.data;
 			});
 		},
 
@@ -618,14 +577,16 @@ export default {
 
 		uploadAttachment() {
 			this.form.append('image', this.cardImg);
-			this.form.append('card_id', this.selected_card.id);
+			this.form.append('cardId', this.selected_card.id);
+			this.form.append('id', this.board_id);
 			const config = { headers: { 'Content-Type': 'multipart/form-data' } }
 			axios.post('../board/newAttachment', this.form, config)
 			.then((response) => {
 				this.cardImg = [];
 				this.cardImgPreview = '';
 				// this.$refs.visitcardmodal.hide();
-				this.getCards();
+				this.board_lists = response.data.board_list;
+				this.selected_card = response.data.card;
 			}).catch(error => {
 				this.$refs.visitcardmodal.hide();
 				this.$swal('No image selected!', '', 'warning')
@@ -634,11 +595,12 @@ export default {
 
 		removeAttachment() {
 			axios.post('../board/' + this.board_id + '/removeAttachment', {
-				cardId: this.selected_card.id
+				cardId: this.selected_card.id,
+				boardId: this.board_id
 			})
 			.then((response) => {
-				// this.$refs.visitcardmodal.hide();
-				this.getCards();
+				this.board_lists = response.data.board_list;
+				this.selected_card = response.data.card;
 			}).catch(error => {
 				this.$swal('Failed to remove. Something went wrong.', '', 'warning')
 			});
@@ -660,36 +622,42 @@ export default {
 			})
 			.then((response) => {
 				this.new_list = '';
-				this.getCards();
+				this.board_lists = response.data;
 			});
 		},
 
 		newCard() {
 			axios.post('../board/'+ this.board_id +'/new_card', {
+				boardId: this.id,
 				listId: this.selected_list_id,
-				cardName: this.new_card,
-				cardDesc: this.new_card_desc
+				card: this.new_card,
 			})
 			.then((response) => {
-				this.new_card = '';
 				this.$refs.newcardmodal.hide();
-				this.getCards();
+				this.board_lists = response.data;
+				this.new_card = { 'name': '', 'description': '' };
 			});
 		},
 
 		selectedCard(card, listName) {
 			this.selected_card = card;
+			console.log(this.selected_card)
 			this.selected_card_name = listName;
 		},
 
 		addLabel(id) {
 			axios.post('../board/'+ this.board_id +'/add_label', {
 				cardId: this.selected_card.id,
-				labelId: id
+				labelId: id,
+				boardId: this.board_id,
+				archived: 0,
 			})
 			.then((response) => {
-				this.selectedCard(response.data.card_info, response.data.list_name);
-				this.getCards();
+				// this.selectedCard(response.data.card_info, response.data.list_name);
+				// this.board_lists = response.data.board_list;
+
+				this.board_lists = response.data.board_list;
+				this.selected_card = response.data.card;
 			});
 		},
 
@@ -703,7 +671,7 @@ export default {
 				labelColorId: this.new_label_color
 			})
 			.then((response) => {
-				this.getCards();
+				// this.getCards();
 			});
 		},
 
@@ -718,7 +686,6 @@ export default {
 			})
 			.then((response) => {
 				this.selected_label = [];
-				this.getCards();
 			});
 		},
 
@@ -727,7 +694,7 @@ export default {
 				labelId: id
 			})
 			.then((response) => {
-				this.getCards();
+				// this.getCards();
 			});
 		},
 
@@ -740,7 +707,7 @@ export default {
 				this.hiddenEditDesc = false;
 				this.modifyDescBtn = true;
 				this.cancelDescBtn = false;
-				this.getCards();
+				// this.getCards();
 			});
 		},
 
@@ -752,7 +719,7 @@ export default {
 			.then((response) => {
 				this.editDueDateHidden = true;
 				this.cancelDueDateBtn = false;
-				this.getCards();
+				// this.getCards();
 			});
 		},
 
@@ -764,19 +731,21 @@ export default {
 			.then((response) => {
 				this.newDueDateHidden = false;
 				this.createNewDueDateBtn = false;
-				this.getCards();
+				// this.getCards();
 			});
 		},
 
 		newChecklist() {
 			axios.post('../board/'+ this.board_id +'/new_checklist', {
 				checkListName: this.new_checklist,
-				cardId: this.selected_card.id
+				cardId: this.selected_card.id,
+				boardId: this.board_id,
 			})
 			.then((response) => {
 				this.new_checklist = '';
 				this.$refs.newChecklistModal.hide();
-				this.getCards();
+				this.board_lists = response.data.board_list;
+				this.selected_card = response.data.card;
 			});
 		},
 
@@ -784,33 +753,41 @@ export default {
 			if (event.target.checked) {
 				axios.post('../board/'+ this.board_id +'/change_list_item', {
 					itemId: id,
+					boardId: this.board_id,
+					cardId: this.selected_card.id,
 					status: 'checked'
 				})
 				.then((response) => {
-					this.getCards();
+					this.board_lists = response.data.board_list;
+					this.selected_card = response.data.card;
 				});
 			}
 			else {
 				axios.post('../board/'+ this.board_id +'/change_list_item', {
 					itemId: id,
+					boardId: this.board_id,
+					cardId: this.selected_card.id,
 					status: 'unchecked'
 				})
 				.then((response) => {
-					this.getCards();
+					this.board_lists = response.data.board_list;
+					this.selected_card = response.data.card;
 				});
 			}
 		},
 
 		saveNewItem(id) {
 			axios.post('../board/'+ this.board_id +'/new_checklist_item', {
+				boardId: this.board_id,
 				cardId: this.selected_card.id,
 				itemName: this.new_checklist_item,
 				checklistId: id
 			})
 			.then((response) => {
+				this.board_lists = response.data.board_list;
+				this.selected_card = response.data.card;
 				this.newChecklistItemHidden = false;
 				this.new_checklist_item = '';
-				this.getCards();
 			});
 		},
 
@@ -847,7 +824,7 @@ export default {
 			})
 			.then((response) => {
 				this.hiddenEditChecklistDesc = {index: true};
-				this.getCards();
+				// this.getCards();
 			});
 		},
 
@@ -868,16 +845,19 @@ export default {
 			})
 			.then((response) => {
 				this.hiddenEditItemItem = {index: true};
-				this.getCards();
+				// this.getCards();
 			});
 		},
 
 		deleteListItem(id) {
 			axios.post('../board/'+ this.board_id +'/delete_checklist_item', {
-				listItemId: id
+				listItemId: id,
+				boardId: this.board_id,
+				cardId: this.selected_card.id,
 			})
 			.then((response) => {
-				this.getCards();
+				this.board_lists = response.data.board_list;
+				this.selected_card = response.data.card;
 			});
 		},
 
@@ -893,10 +873,13 @@ export default {
 
 		confirmDeleteChecklist(id, index) {
 			axios.post('../board/'+ this.board_id +'/delete_checklist', {
-				checklistId: id
+				checklistId: id,
+				boardId: this.board_id,
+				cardId: this.selected_card.id
 			})
 			.then((response) => {
-				this.getCards();
+				this.board_lists = response.data.board_list;
+				this.selected_card = response.data.card;
 				this.deleteChecklist = {index: true};
 			});
 		},
@@ -913,10 +896,11 @@ export default {
 
 		sendToArchive() {
 			axios.post('../board/'+ this.board_id +'/sendToArchive', {
-				cardId: this.selected_card.id
+				cardId: this.selected_card.id,
+				boardId: this.board_id
 			})
 			.then((response) => {
-				this.getCards();
+				this.board_lists = response.data;
 				this.$refs.visitcardmodal.hide();
 			});
 		},
@@ -931,7 +915,8 @@ export default {
 			}).then((result) => {
 				if (result.value) {
 					axios.post('../board/archiveBoard', {
-						boardId: id
+						listId: id,
+						boardId: this.board_id
 					})
 					.then((response) => {
 						this.$swal({
@@ -941,7 +926,7 @@ export default {
 							timer: 1500
 						})
 						this.$refs.listSettingModal.hide();
-						this.getCards();
+						this.board_lists = response.data;
 					});
 				}
 			})
@@ -957,7 +942,8 @@ export default {
 			}).then((result) => {
 				if (result.value) {
 					axios.post('../board/deleteBoardList', {
-						boardId: id
+						listId: id,
+						boardId: this.board_id
 					})
 					.then((response) => {
 						this.$swal({
@@ -967,7 +953,33 @@ export default {
 							timer: 1500
 						})
 						this.$refs.listSettingModal.hide();
-						this.getCards();
+						this.board_lists = response.data;
+					});
+				}
+			})
+		},
+		deleteCard() {
+			this.$swal({
+				title: 'Are you sure to delete this card?',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: 'Confirm'
+			}).then((result) => {
+				if (result.value) {
+					axios.post('../board/deleteCard', {
+						card: this.selected_card,
+						boardId: this.board_id
+					})
+					.then((response) => {
+						this.$swal({
+							type: 'success',
+							title: 'Deleted!',
+							showConfirmButton: false,
+							timer: 1500
+						})
+						this.$refs.visitcardmodal.hide();
+						this.board_lists = response.data;
 					});
 				}
 			})

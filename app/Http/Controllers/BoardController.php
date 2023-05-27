@@ -30,30 +30,8 @@ class BoardController extends Controller
 
     public function index()
     {
-        $starred_board_list = BoardMember::join('boards', 'board_members.boards_id', '=', 'boards.id')
-                                ->where('board_members.users_id', '=', Auth::user()->id)
-                                ->where('board_members.starred', '=', 1)
-                                ->select(['boards.id', 'boards.board_name', 'boards.description', 'board_members.starred'])
-                                ->get();
-        $board_list = BoardMember::join('boards', 'board_members.boards_id', '=', 'boards.id')
-                                ->where('board_members.users_id', '=', Auth::user()->id)
-                                ->select(['boards.id', 'boards.board_name', 'boards.description', 'board_members.starred'])
-                                ->get();
-    	return view('board.index', compact('board_list', 'starred_board_list'));
-    }
-
-    public function getBoardList()
-    {
-        $starred_board_list = BoardMember::join('boards', 'board_members.boards_id', '=', 'boards.id')
-                                ->where('board_members.users_id', '=', Auth::user()->id)
-                                ->where('board_members.starred', '=', 1)
-                                ->select(['boards.id', 'boards.board_name', 'boards.description', 'board_members.starred'])
-                                ->get();
-    	$board_list = BoardMember::join('boards', 'board_members.boards_id', '=', 'boards.id')
-                                ->where('board_members.users_id', '=', Auth::user()->id)
-                                ->select(['boards.id', 'boards.board_name', 'boards.description', 'board_members.starred'])
-                                ->get();
-    	return response()->json(['starred_board_list' => $starred_board_list, 'board_list' => $board_list]);
+        $board_list = BoardMember::where('users_id', Auth::user()->id)->with(['board'])->get();
+    	return view('board.index', compact('board_list'));
     }
 
     public function saveNewBoard(Request $request)
@@ -67,38 +45,26 @@ class BoardController extends Controller
         $board_member = new BoardMember();
         $board_member -> boards_id = $new_board -> id;
         $board_member -> users_id = $this->users_id;
-        // $board_member -> permissions_id = 1;
         $board_member -> date_joined = date('Y-m-d');
         $board_member -> starred = 0;
         $board_member -> is_owner = 1;
         $board_member -> save();
     	
-    	return response()->json($new_board);
+    	return $this->getBoardList();
     }
 
-    public function starBoard(Request $request)
+    public function boardStatus(Request $request)
     {
-        $board = BoardMember::join('boards', 'board_members.boards_id', '=', 'boards.id')
-                                ->where('board_members.users_id', '=', Auth::user()->id)
-                                ->where('board_members.boards_id', '=', $request -> boardId)
-                                ->select(['board_members.id'])->get()->last();
-    	$add_star = BoardMember::find($board -> id);
-    	$add_star -> starred = 1;
-    	$add_star -> save();
+        $user_board = BoardMember::find($request->boardId);
+        $user_board -> starred = $request->status;
+        $user_board -> save();
 
-    	return response()->json($add_star);
+        return $this->getBoardList();
     }
 
-    public function unstarBoard(Request $request)
+    private function getBoardList()
     {
-        $board = BoardMember::join('boards', 'board_members.boards_id', '=', 'boards.id')
-                                ->where('board_members.users_id', '=', Auth::user()->id)
-                                ->where('board_members.boards_id', '=', $request -> boardId)
-                                ->select(['board_members.id'])->get()->last();
-    	$remove_star = BoardMember::find($board -> id);
-    	$remove_star -> starred = 0;
-    	$remove_star -> save();
-
-    	return response()->json($remove_star);
+        $board_list = BoardMember::where('users_id', Auth::user()->id)->with(['board'])->get();
+        return $board_list;
     }
 }
